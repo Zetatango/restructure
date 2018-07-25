@@ -7,8 +7,15 @@ class Pointer
     @options.allowNull ?= true
     @options.nullValue ?= 0
     @options.lazy ?= false
-    if @options.relativeTo
-      @relativeToGetter = new Function('ctx', "return ctx.#{@options.relativeTo}")
+
+  # this.options.relativeTo may be a string of properties
+  #   'foo'
+  #   'foo.bar'
+  # this property chain will be executed against `ctx`
+  relativeToGetter: (ctx) ->
+    @options.relativeTo.split('.').reduce((obj, prop) ->
+      obj[prop]
+    , ctx)
 
   decode: (stream, ctx) ->
     offset = @offsetType.decode(stream, ctx)
